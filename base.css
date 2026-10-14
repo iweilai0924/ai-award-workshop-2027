@@ -1,25 +1,54 @@
 /* ==========================================================================
-   base.css — 數感簡報範本（自適應 adaptive 版）
+   base.css — AI數感盃簡報範本（自適應 adaptive 版）
    --------------------------------------------------------------------------
-   特性（自適應版）：
-   ‧ 尺寸單位 vw → 自適應 --u（= 1cqw＝舞台寬的 1%）；舞台鎖 16:9 雙向置中，
-     任何螢幕都不裁切、不漂移。
-   ‧ 新配色 #379C39 / #004B24 / #FEF4E8；內嵌 SVG logo（靠 currentColor 染色）。
-   ‧ 內容安全框 .slide-frame；舞台外底色延伸（bleed，純 :has() CSS）。
-   ‧ 內建：規劃模式（P）、總覽模式（O）、列印出 1920×1080 PDF。
+   這是第三套 deck-kit。與 deck-kit_數感實驗室／deck-kit_NUMiNAI 共用同一套
+   版型系統、單位規範、linter 與操作鍵，差別只在「底板設計」：
+
+   ‧ 設計來源：2027 AI數感盃簡報模板 .pptx（Google Slides 版）。色票、字體、
+     底板幾何全部從該檔原始檔取出，不是憑印象調的。
+       #2A3F54 深藍灰（主標／內文）  #006689 數感青（副標／標籤／規線）
+       #30B6E5 亮天藍（強調／頁碼／階梯長條）  #EFF7FC 淺藍紙  #757575 內文灰
+   ‧ 底板三件事：①左緣三段緞帶 ②角落霧氣 ③階梯長條（章節／封面頁才出現）
+     全部用 CSS 漸層畫，沒有底圖檔，換螢幕不糊、印 PDF 不糊。
+   ‧ 標題改「左直條」（▌大標題），不是數感實驗室版的「上橫線」。
+   ‧ 頁尾改成一條軌：[logo] 章節標籤 ————————— 頁碼。
+   ‧ 章節大數字用 Play（模板原字體），並帶「上濃下淡」的漸層。
+
+   尺寸單位 vw → 自適應 --u（= 1cqw＝舞台寬的 1%）；舞台鎖 16:9 雙向置中。
    字級換算：一般 vw 範本的「Nvw」對應這裡的「calc(N*var(--u))」；16:9 螢幕下兩者等值，
    所以「內容字 ≥ 2vw」鐵則 = 「≥ calc(2*var(--u))」。check_deck.py 兩種都認得。
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap');   /* 章節大數字 */
 
 :root{
-  /* 配色 */
-  --green-primary:#379C39; --green-dark:#004B24; --hi-yellow:#E8FF3A;
-  --paper:#FFFFFF; --paper-warm:#FEF4E8; --ink:#0A0A0A; --mid-gray:#686968; --label-gray:#757070;
-  --letterbox:#EAF3E7;
-  --alert:#BE2026; --alert-soft:#FBEAE9;   /* 語意色：負面/避開/警示，少量用 */
+  /* ── AI數感盃色票（取自模板 .pptx 原始色碼，勿自行微調）────────────── */
+  --nx-navy:#2A3F54;        /* 主標、內文：深藍灰 */
+  --nx-navy-deep:#17293A;   /* 深底頁（呼吸頁、章節導覽頁） */
+  --nx-navy-ink:#101E2A;    /* 最深：滿版照片頁的 letterbox */
+  --nx-teal:#006689;        /* 數感青：副標、標籤、規線、logo */
+  --nx-teal-deep:#004F6B;
+  --nx-azure:#30B6E5;       /* 亮天藍：標題左條、頁碼、階梯長條、資料長條 */
+  --nx-azure-lt:#8ED8F2;    /* 漸層中段 */
+  --nx-sky:#5FD0F5;         /* 深底上的 pop 色／螢光標（取代原本的螢光黃） */
+  --nx-tint:#EFF7FC;        /* 淺藍紙：卡片底、次級底色 */
+  --nx-mist:#E7F5F9;        /* 角落霧氣 */
+  --nx-line:#D5E3EC;        /* 細線／分隔線 */
+  --nx-line-mid:#AFC6D4;    /* 中線／框線 */
+  --nx-gray:#6C7C89;        /* 內文灰 */
+
+  /* ── 版型語意 token：名稱沿用 deck-kit_數感實驗室，所以三套 kit 的 deck 可互換 ──
+     要整套換色，改上面的色票即可，不要逐條改下面的規則。 */
+  --green-primary:var(--nx-teal);      /* 「主強調色」在這套 kit ＝ 數感青 */
+  --green-dark:var(--nx-navy-deep);    /* 「深底色」＝ 深藍夜 */
+  --hi-yellow:var(--nx-sky);           /* 「螢光標／pop 色」＝ 亮天藍 */
+  --paper:#FFFFFF; --paper-warm:var(--nx-tint);
+  --ink:var(--nx-navy); --mid-gray:var(--nx-gray); --label-gray:var(--nx-teal);
+  --letterbox:#E8F4FA;
+  --alert:#D6414B; --alert-soft:#FCECEE;   /* 語意色：負面/避開/警示，少量用 */
   --font-family:'Noto Sans TC',sans-serif;
+  --font-num:'Play','Noto Sans TC',sans-serif;   /* 數字專用（章節號、頁碼、KPI） */
 
   /* 自適應單位：1cqw = 舞台寬的 1% */
   --u: 1cqw;
@@ -34,30 +63,36 @@
   --lh-tight:1.3; --lh-normal:1.7; --lh-loose:1.95;
   --gap-xs:calc(0.4 * var(--u)); --gap-sm:calc(0.8 * var(--u)); --gap-md:calc(1.5 * var(--u)); --gap-lg:calc(3 * var(--u)); --gap-xl:calc(5 * var(--u));
   --radius-sm:calc(0.4 * var(--u)); --radius-md:calc(1.2 * var(--u));
-  --shadow-card:0 calc(0.3 * var(--u)) calc(1.5 * var(--u)) rgba(0,0,0,0.04); --shadow-elevated:0 calc(0.5 * var(--u)) calc(2 * var(--u)) rgba(0,0,0,0.08);
+  --shadow-card:0 calc(0.3 * var(--u)) calc(1.5 * var(--u)) rgba(21,52,73,0.06); --shadow-elevated:0 calc(0.5 * var(--u)) calc(2 * var(--u)) rgba(21,52,73,0.12);
   --slide-padding:calc(5 * var(--u)); --safe-x:calc(7 * var(--u)); --safe-y:calc(6 * var(--u));
   --edge-x:calc(7 * var(--u)); --edge-bottom:calc(4.4 * var(--u));
+
+  /* ── 底板零件（.slide::before 用；想微調底板濃淡改這裡）───────────── */
+  --nx-bar-strong:#4FC2E8;                       /* 階梯長條頂端 */
+  --nx-bar-mid:#A8DEF2;                          /* 階梯長條中段 */
+  --nx-grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.055'/%3E%3C/svg%3E");
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font-family);font-size:16px;color:var(--ink);background:var(--letterbox);-webkit-font-smoothing:antialiased;text-wrap:pretty;}
 
 /* ===== 底色延伸（bleed）：舞台外補底色「跟著當前頁」，純 :has() CSS，不需 JS =====
-   原則：letterbox 對應該頁底色——白頁補白、米白頁補米白、深綠頁補深綠。
-   ⚠ 下面這些 probe-* class 是「參考頁面 class」，做自己的 deck 時換成你各頁的 class。
+   原則：letterbox 對應該頁底色——白頁補白、淺藍頁補淺藍、深藍頁補深藍。
+   ⚠ 下面這些 probe-* / nx-* class 是「參考頁面 class」，做自己的 deck 時換成你各頁的 class。
    ⚠ 選擇器限定 .deck 內的 active 頁 —— 總覽模式(O)的縮圖是 .deck 外的複製品，
      若不限定會誤判「有 active 章節頁」而把底色卡住（曾經的 bug）。 */
 body{background:#FFFFFF;transition:background .4s ease;}                            /* 白底內容頁 → 補白 */
-body:has(.deck .slide.active.probe-thanks){background:var(--paper-warm);}           /* 收尾米白 → 補米白 */
-body:has(.deck .slide.active.probe-flow-page){background:var(--paper-warm);}        /* 流程頁米白 → 補米白 */
+body:has(.deck .slide.active.probe-thanks){background:var(--paper-warm);}           /* 收尾淺藍 → 補淺藍 */
+body:has(.deck .slide.active.probe-flow-page){background:var(--paper-warm);}        /* 流程頁淺藍 → 補淺藍 */
+body:has(.deck .slide.active.nx-dark),
 body:has(.deck .slide.active.probe-stats),
-body:has(.deck .slide.active.probe-breather){background:var(--green-dark);}         /* 深綠呼吸頁 → 補深綠 */
-/* 章節分隔：左綠右米白，接縫沿舞台 38% 自動對齊（D = 舞台寬，seam = 50vw - 0.12D）*/
+body:has(.deck .slide.active.probe-breather){background:var(--green-dark);}         /* 深藍呼吸頁 → 補深藍 */
+/* 章節分隔：左青右淺藍，接縫沿舞台 38% 自動對齊（D = 舞台寬，seam = 50vw - 0.12D）*/
 body:has(.deck .slide.active.probe-chapter){
   background:linear-gradient(90deg,
-    var(--green-primary) calc(50vw - 0.12 * min(100vw, 177.7778vh)),
-    var(--paper-warm)    calc(50vw - 0.12 * min(100vw, 177.7778vh)));
+    var(--green-dark) calc(50vw - 0.12 * min(100vw, 177.7778vh)),
+    var(--paper-warm) calc(50vw - 0.12 * min(100vw, 177.7778vh)));
 }
-body:has(.deck .slide.active.probe-photo){background:var(--ink);}                    /* 滿版圖封面 → 補深色 */
+body:has(.deck .slide.active.probe-photo){background:var(--nx-navy-ink);}           /* 滿版圖封面 → 補深色 */
 
 /* ===== 鎖定 16:9 舞台：永遠等比、置中 ===== */
 .deck{position:fixed;inset:0;margin:auto;width:min(100vw,177.7778vh);aspect-ratio:16/9;container-type:inline-size;background:var(--paper);overflow:hidden;}
@@ -65,16 +100,159 @@ body:has(.deck .slide.active.probe-photo){background:var(--ink);}               
 .slide:has(.slide-frame){padding:0;}
 .slide.active{opacity:1;pointer-events:auto;z-index:1;}
 
+/* ==============================================================
+   底板（backdrop）— AI數感盃這套 kit 的識別
+   --------------------------------------------------------------
+   每頁一層 .slide::before（z-index:-1，壓在該頁 inline background 上面、
+   內容下面），所以各頁照舊要寫 inline background，不必改結構。
+
+   四種底板，用 section 的 class 切換：
+     （不加）       內容頁：左緣三段緞帶 ＋ 右上／左下霧氣 ＋ 紙紋
+     .nx-steps      封面／章節／收尾：改成「左上＋右下」兩組階梯長條
+     .nx-dark       深藍底頁：霧氣轉深、長條轉亮，chrome 自動轉白
+     .nx-bare       滿版照片／影片頁：整個底板關掉
+
+   底板是「零件疊出來的」，每組零件是一個 CSS 變數，所以可以單獨關掉：
+     .nx-no-br  關掉右下那組階梯（版型右下角有內容時用，例如封面的副標＋logo）
+     .nx-no-tl  關掉左上那組階梯
+   幾何全部量自模板底圖（位置與寬高換算成 u：1u＝舞台寬 1%，舞台高 56.25u），
+   要調濃淡改 :root 的顏色，不要動座標。
+   ============================================================== */
+:root{
+  --nx-none:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0)) 0 0/1px 1px no-repeat;
+
+  /* 內容頁：左緣三段緞帶 */
+  --nx-bg-ribbon:
+    linear-gradient(180deg,var(--nx-bar-strong) 0%,var(--nx-bar-mid) 46%,rgba(168,222,242,0) 100%)
+      0 0/calc(1.9*var(--u)) calc(9.6*var(--u)) no-repeat,
+    linear-gradient(180deg,#BFE8F5 0%,rgba(191,232,245,0) 100%)
+      calc(1.85*var(--u)) calc(19.5*var(--u))/calc(1.5*var(--u)) calc(11.5*var(--u)) no-repeat,
+    linear-gradient(180deg,#CDEDF6 0%,rgba(205,237,246,0.25) 100%)
+      calc(2*var(--u)) calc(52.6*var(--u))/calc(1.3*var(--u)) calc(3.7*var(--u)) no-repeat;
+
+  /* 封面／章節：左上階梯（寬短 → 窄長，往右下走） */
+  --nx-bg-tl:
+    linear-gradient(180deg,var(--nx-bar-mid) 0%,rgba(168,222,242,0) 100%)
+      0 0/calc(4.9*var(--u)) calc(4.6*var(--u)) no-repeat,
+    linear-gradient(180deg,#4AA9C2 0%,var(--nx-bar-mid) 40%,rgba(168,222,242,0) 100%)
+      calc(3.2*var(--u)) calc(3.5*var(--u))/calc(2.8*var(--u)) calc(6.6*var(--u)) no-repeat,
+    linear-gradient(180deg,var(--nx-bar-strong) 0%,rgba(141,211,243,0) 100%)
+      calc(11.6*var(--u)) calc(7.1*var(--u))/calc(1.05*var(--u)) calc(6.2*var(--u)) no-repeat,
+    linear-gradient(180deg,#4AACC4 0%,rgba(141,211,243,0) 100%)
+      calc(13.8*var(--u)) calc(11*var(--u))/calc(0.95*var(--u)) calc(6.3*var(--u)) no-repeat;
+
+  /* 封面／章節：右下階梯（鏡像） */
+  --nx-bg-br:
+    linear-gradient(180deg,#89D3EE 0%,rgba(137,211,238,0) 100%)
+      calc(95*var(--u)) calc(43*var(--u))/calc(5*var(--u)) calc(6.6*var(--u)) no-repeat,
+    linear-gradient(180deg,#41BDE3 0%,rgba(65,189,227,0) 100%)
+      calc(86.8*var(--u)) calc(48.1*var(--u))/calc(4.6*var(--u)) calc(5.6*var(--u)) no-repeat,
+    linear-gradient(180deg,#ABE2F7 0%,rgba(171,226,247,0) 100%)
+      calc(90.7*var(--u)) calc(38.7*var(--u))/calc(1.15*var(--u)) calc(7.2*var(--u)) no-repeat,
+    linear-gradient(180deg,#96CDE1 0%,rgba(150,205,225,0) 100%)
+      calc(97.6*var(--u)) calc(49.1*var(--u))/calc(0.95*var(--u)) calc(4.2*var(--u)) no-repeat;
+
+  /* 深底頁：同一套幾何，改成亮條 */
+  --nx-bg-ribbon-d:
+    linear-gradient(180deg,rgba(95,208,245,0.55) 0%,rgba(95,208,245,0) 100%)
+      0 0/calc(1.9*var(--u)) calc(9.6*var(--u)) no-repeat,
+    linear-gradient(180deg,rgba(95,208,245,0.30) 0%,rgba(95,208,245,0) 100%)
+      calc(1.85*var(--u)) calc(19.5*var(--u))/calc(1.5*var(--u)) calc(11.5*var(--u)) no-repeat;
+  --nx-bg-br-d:
+    linear-gradient(180deg,rgba(48,182,229,0.45) 0%,rgba(48,182,229,0) 100%)
+      calc(95*var(--u)) calc(43*var(--u))/calc(5*var(--u)) calc(6.6*var(--u)) no-repeat,
+    linear-gradient(180deg,rgba(48,182,229,0.34) 0%,rgba(48,182,229,0) 100%)
+      calc(86.8*var(--u)) calc(48.1*var(--u))/calc(4.6*var(--u)) calc(5.6*var(--u)) no-repeat,
+    linear-gradient(180deg,rgba(95,208,245,0.40) 0%,rgba(95,208,245,0) 100%)
+      calc(90.7*var(--u)) calc(38.7*var(--u))/calc(1.15*var(--u)) calc(7.2*var(--u)) no-repeat;
+
+  /* 紙紋與角落霧氣 */
+  --nx-bg-grain:var(--nx-grain) 0 0/calc(11*var(--u)) calc(11*var(--u)) repeat;
+  --nx-bg-mist:
+    radial-gradient(58% 62% at 100% 0%, rgba(199,234,242,0.80) 0%, rgba(199,234,242,0) 72%),
+    radial-gradient(52% 46% at 0% 100%, rgba(214,238,246,0.62) 0%, rgba(214,238,246,0) 74%);
+  --nx-bg-mist-strong:
+    radial-gradient(62% 66% at 100% 0%, rgba(199,234,242,0.88) 0%, rgba(199,234,242,0) 72%),
+    radial-gradient(58% 50% at 0% 100%, rgba(214,238,246,0.72) 0%, rgba(214,238,246,0) 74%);
+  --nx-bg-mist-d:
+    radial-gradient(62% 66% at 100% 0%, rgba(48,182,229,0.24) 0%, rgba(48,182,229,0) 72%),
+    radial-gradient(58% 50% at 0% 100%, rgba(0,102,137,0.28) 0%, rgba(0,102,137,0) 74%);
+}
+
+.slide::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:var(--nx-bg-ribbon), var(--nx-bg-grain), var(--nx-bg-mist);
+}
+.slide.nx-steps::before{
+  background:var(--nx-bg-tl), var(--nx-bg-br), var(--nx-bg-grain), var(--nx-bg-mist-strong);
+}
+.slide.nx-dark::before,
+.slide.probe-breather::before,
+.slide.probe-stats::before{
+  background:var(--nx-bg-ribbon-d), var(--nx-bg-br-d), var(--nx-bg-grain), var(--nx-bg-mist-d);
+}
+/* 滿版照片／影片頁：底板整個關掉 */
+.slide.nx-bare::before,
+.slide.probe-photo::before,
+.slide.probe-video::before{display:none;}
+
+/* 單獨關掉某一組階梯（版型那個角落有內容時用） */
+.nx-no-br{--nx-bg-br:var(--nx-none);--nx-bg-br-d:var(--nx-none);}
+.nx-no-tl{--nx-bg-tl:var(--nx-none);}
+/* 封面版型的右下角固定是副標＋logo，預設就關掉右下那組 */
+.slide.probe-cover{--nx-bg-br:var(--nx-none);--nx-bg-br-d:var(--nx-none);}
+
 /* ===== 內容安全框：把內容包進 .slide-frame，連 absolute 也跑不出去 ===== */
 .slide-frame{position:absolute;inset:var(--safe-y) var(--safe-x);display:flex;flex-direction:column;min-height:0;}
 .deck.safe-guides .slide-frame{outline:2px dashed rgba(220,38,38,0.55);}   /* 按 g 顯示安全線 */
 
-/* ===== 共用 chrome ===== */
-.page-label{position:absolute;top:calc(3 * var(--u));left:var(--edge-x);display:flex;align-items:center;gap:calc(0.9 * var(--u));font-size:calc(1.1 * var(--u));font-weight:700;color:var(--label-gray);letter-spacing:0.05em;z-index:5;}
-.page-label__num{display:inline-block;min-width:calc(2.2 * var(--u));text-align:center;padding:calc(0.15 * var(--u)) calc(0.55 * var(--u));background:var(--green-primary);color:var(--paper);border-radius:calc(0.3 * var(--u));}
-.page-label__bar{display:inline-block;width:calc(1.6 * var(--u));height:2px;background:var(--label-gray);}
-.brand-footer{position:absolute;bottom:calc(2 * var(--u));right:var(--edge-x);display:flex;align-items:center;z-index:5;}
-.brand-footer .brand-logo{display:block;height:calc(1.8 * var(--u));width:calc(6.4 * var(--u));color:var(--green-primary);}
+/* ==============================================================
+   共用 chrome —— 頁尾一條軌：[logo]　章節標籤　————————　頁碼
+   （模板的頁尾就是這個形狀；頁首刻意留空）
+   DOM 順序是 num → bar → 標籤，用 order 重排成「標籤 → 線 → 號碼」。
+   ============================================================== */
+.page-label{position:absolute;left:var(--edge-x);right:var(--edge-x);bottom:calc(2.25*var(--u));top:auto;
+  display:flex;align-items:center;gap:calc(1.3*var(--u));
+  font-size:calc(1.1*var(--u));font-weight:700;color:var(--nx-teal);letter-spacing:0.08em;z-index:5;}
+.slide:has(.brand-footer) .page-label{left:calc(var(--edge-x) + 8.4*var(--u));}   /* 讓開左下角的 logo */
+.page-label > span:not([class]){order:1;white-space:nowrap;}
+.page-label__bar{order:2;flex:1;display:inline-block;width:auto;height:1px;background:var(--nx-line);}
+.page-label__num{order:3;font-family:var(--font-num);font-weight:700;font-size:calc(1.35*var(--u));
+  letter-spacing:0.06em;color:var(--nx-azure);background:none;padding:0;min-width:0;border-radius:0;text-align:right;}
+
+.brand-footer{position:absolute;bottom:calc(2.1*var(--u));left:var(--edge-x);right:auto;display:flex;align-items:center;z-index:5;}
+.brand-footer .brand-logo{display:block;height:calc(1.8*var(--u));width:calc(6.4*var(--u));color:var(--nx-teal);}
+
+/* 深底頁的 chrome 自動轉白（不必每頁再寫覆寫） */
+.slide.nx-dark .page-label,
+.slide.probe-breather .page-label,
+.slide.probe-stats .page-label,
+.slide.nx-onphoto .page-label{color:rgba(255,255,255,0.72);}
+.slide.nx-dark .page-label__bar,
+.slide.probe-breather .page-label__bar,
+.slide.probe-stats .page-label__bar,
+.slide.nx-onphoto .page-label__bar{background:rgba(255,255,255,0.26);}
+.slide.nx-dark .page-label__num,
+.slide.probe-breather .page-label__num,
+.slide.probe-stats .page-label__num,
+.slide.nx-onphoto .page-label__num{color:var(--nx-sky);}
+.slide.nx-dark .brand-logo,
+.slide.probe-breather .brand-logo,
+.slide.probe-stats .brand-logo,
+.slide.nx-onphoto .brand-logo{color:rgba(255,255,255,0.55);}
+
+/* ===== 標題左直條（▌大標題）— 這套 kit 的標題記號，取代上橫線 ===== */
+.nx-rule{border-left:calc(0.5*var(--u)) solid var(--nx-azure);padding-left:calc(1.5*var(--u));}
+.nx-rule--teal{border-left-color:var(--nx-teal);}
+
+/* ===== 章節大數字：Play 字體 ＋ 上濃下淡漸層（模板的 01／02 就是這個）===== */
+.nx-num{font-family:var(--font-num);font-weight:700;letter-spacing:-0.01em;
+  background:linear-gradient(180deg,var(--nx-azure) 0%,var(--nx-azure-lt) 52%,rgba(255,255,255,0.92) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.slide.nx-dark .nx-num{background:linear-gradient(180deg,var(--nx-sky) 0%,rgba(95,208,245,0.72) 55%,rgba(255,255,255,0.55) 100%);
+  -webkit-background-clip:text;background-clip:text;}
+.nx-figure{font-family:var(--font-num);font-weight:700;}   /* 一般數字想用 Play 時加這個 */
+
 .hi{background-image:linear-gradient(180deg,transparent 12%,var(--hi-yellow) 12%,var(--hi-yellow) 88%,transparent 88%);padding:0 0.15em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
 /* ===== 警示語意修飾 .alert（少量、克制；原則與落地對照見 template-spec §四）=====
    掛在標準版型上換成紅語意，不另立紅版型。用既有 --alert / --alert-soft token。 */
@@ -85,7 +263,7 @@ body:has(.deck .slide.active.probe-photo){background:var(--ink);}               
 .alert-mark{color:var(--alert);font-weight:900;}                 /* 紅 ×(U+00D7)/●/！等警示標記 */
 .tbd{color:var(--alert);border:1px dashed var(--alert);border-radius:var(--radius-sm);padding:0 calc(0.4 * var(--u));font-weight:700;}  /* 待填佔位 */
 .nowrap,.no-orphan{white-space:nowrap;}
-.progress{position:fixed;bottom:calc(1.5 * var(--u));right:calc(2 * var(--u));font-family:var(--font-family);font-size:calc(0.8 * var(--u));color:rgba(0,0,0,0.3);z-index:100;pointer-events:none;}
+.progress{position:fixed;bottom:calc(1.5 * var(--u));right:calc(2 * var(--u));font-family:var(--font-family);font-size:calc(0.8 * var(--u));color:rgba(42,63,84,0.32);z-index:100;pointer-events:none;}
 
 /* ==============================================================
    規劃層（Plan Layer）— 把「規劃」與「成品」合併在單一檔
@@ -100,7 +278,7 @@ body:has(.deck .slide.active.probe-photo){background:var(--ink);}               
 #plan-panel { display: none; }    /* 規劃面板，預設隱藏 */
 
 /* 規劃模式：開放捲動；舞台改 static 置頂、維持舞台寬（container 仍生效），面板接下方 */
-/* 注意：body 不染色 —— 上方投影片兩側留白維持該頁原本底色（bleed），只有下方面板是綠帶 */
+/* 注意：body 不染色 —— 上方投影片兩側留白維持該頁原本底色（bleed），只有下方面板是深藍帶 */
 html.mode-plan, html.mode-plan body { height: auto; overflow-y: auto; }
 body.mode-plan .deck { position: static; margin: 0 auto; height: auto; aspect-ratio: auto; }
 body.mode-plan .slide { display: none; }
@@ -111,7 +289,7 @@ body.mode-plan .slide.active {
 }
 body.mode-plan #plan-panel {
   display: block;
-  width: 100%; margin: 0; box-sizing: border-box;     /* 整條全寬綠帶（不再置中縮窄）*/
+  width: 100%; margin: 0; box-sizing: border-box;     /* 整條全寬深藍帶（不再置中縮窄）*/
   background: var(--green-dark); color: #fff;
   padding: 2.2vw 7vw 4vw;
   animation: plan-down 0.22s ease;
@@ -134,9 +312,9 @@ body.mode-plan #plan-panel {
   margin-top: 1.1vw; padding-top: 0.7vw;
 }
 #plan-panel .plan-note__meta b { color: var(--hi-yellow); font-weight: 700; }
-#plan-panel .plan-note__meta .stop { color: #ff9a9a; font-weight: 700; }
+#plan-panel .plan-note__meta .stop { color: #FF9A9A; font-weight: 700; }
 
-/* 原文裡「被萃取成投影片重點」的句子：黃色底線 */
+/* 原文裡「被萃取成投影片重點」的句子：亮藍底線 */
 .src-key {
   text-decoration: underline;
   text-decoration-color: var(--hi-yellow);
@@ -149,10 +327,10 @@ body.mode-plan #plan-panel {
 .mode-hint {
   position: fixed; top: 1.6vw; right: 1.8vw;
   font-size: 0.78vw; font-weight: 700;
-  color: var(--green-primary);
+  color: var(--nx-teal);
   background: rgba(255,255,255,0.9);
   padding: 0.35vw 0.95vw; border-radius: 100vw;
-  box-shadow: 0 0.2vw 0.8vw rgba(0,0,0,0.12);
+  box-shadow: 0 0.2vw 0.8vw rgba(21,52,73,0.16);
   font-family: var(--font-family);
   z-index: 200; pointer-events: none; letter-spacing: 0.05em;
 }
@@ -239,13 +417,13 @@ body.mode-plan #plan-panel {
 /* ① 點擊揭曉：一張蓋牌蓋住答案 */
 .rvz{position:relative;}
 .rvz__cover{position:absolute;inset:0;z-index:3;cursor:pointer;
-  background:var(--paper-warm);border-left:calc(0.5*var(--u)) solid var(--green-primary);
+  background:var(--paper-warm);border-left:calc(0.5*var(--u)) solid var(--nx-azure);
   border-radius:var(--radius-md);box-shadow:var(--shadow-card);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:calc(0.8*var(--u));transition:opacity .45s ease, transform .45s ease;}
-.rvz__cover-t{font-size:calc(2.3*var(--u));font-weight:900;color:var(--green-dark);
+.rvz__cover-t{font-size:calc(2.3*var(--u));font-weight:900;color:var(--nx-navy-deep);
   text-align:center;line-height:1.45;padding:0 calc(2.4*var(--u));}
-.rvz__hint{font-size:calc(1.5*var(--u));font-weight:700;color:rgba(0,75,36,0.62);letter-spacing:0.1em;}
+.rvz__hint{font-size:calc(1.5*var(--u));font-weight:700;color:rgba(23,41,58,0.62);letter-spacing:0.1em;}
 .rvz__hint::before{content:"▶ ";}
 .rvz.is-open .rvz__cover{opacity:0;transform:scale(0.97);pointer-events:none;}
 
@@ -270,7 +448,7 @@ body.mode-plan #plan-panel {
 .optbtn{cursor:pointer;transition:background .3s ease,border-color .3s ease,opacity .3s ease,color .3s ease;}
 .is-ans .optbtn{cursor:default;}
 .is-ans .optbtn:not([data-ok]){opacity:0.3;}
-.is-ans .optbtn[data-ok]{background:var(--hi-yellow);border-color:var(--hi-yellow);color:#0A0A0A;}
+.is-ans .optbtn[data-ok]{background:var(--hi-yellow);border-color:var(--hi-yellow);color:var(--nx-navy-deep);}
 /* 用 visibility 佔位，揭曉時版面才不會跳 */
 .optans{visibility:hidden;opacity:0;transition:opacity .45s ease;}
 .is-ans .optans{visibility:visible;opacity:1;}

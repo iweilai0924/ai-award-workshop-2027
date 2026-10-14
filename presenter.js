@@ -190,3 +190,76 @@
   updatePlan();
   updateHint();
 })();
+
+/* ── 按一下逐步（.stepclick）導覽與重設（老師 2026-10-14）──
+   1. 回到一頁時，這頁的逐步互動全部重設，可以重新按（離開後就重設）。
+   2. → ／空白鍵／PageDown／點右邊：這頁還有沒出來的步驟時，先出下一步，全部出完才翻頁。
+   3. ← ／PageUp／點左邊：這頁已經出過步驟時，先退回上一步，退到最前面才回上一頁。
+   支援兩種寫法：單步（onclick 加 is-done）與多步（data-n＋data-k＋s1…sN）。
+   也一併重設 .optbtn 選答（is-ans）與 .rvz 揭曉（is-open）。 */
+(function () {
+  if (window.__stepNav) return; window.__stepNav = true;
+  function editing() { var r = document.documentElement; return r.classList.contains('edit-on') || r.classList.contains('plan-on') || document.body.classList.contains('overview-on'); }
+  function active() { return document.querySelector('.deck > .slide.active'); }
+  function steps(slide) { return slide ? Array.from(slide.querySelectorAll('.stepclick')) : []; }
+  function total(el) { return +el.dataset.n || 1; }
+  function done(el) { return +el.dataset.k || (el.classList.contains('is-done') ? total(el) : 0); }
+  function syncSlide(slide) {
+    var all = steps(slide), fin = all.length && all.every(function (el) { return done(el) >= total(el); });
+    if (slide.classList.contains('is-stepdone') !== !!fin) slide.classList.toggle('is-stepdone', !!fin);
+  }
+  function forward(slide) {
+    var el = steps(slide).find(function (x) { return done(x) < total(x); });
+    if (!el) return false;
+    el.click();                                   // 交給這個元件自己的 onclick（動畫、class 都照原本的寫法）
+    return true;
+  }
+  function back(slide) {
+    var el = steps(slide).reverse().find(function (x) { return done(x) > 0; });
+    if (!el) return false;
+    var k = done(el);
+    if (el.dataset.n) {
+      el.classList.remove('s' + k);
+      k -= 1;
+      if (k > 0) el.dataset.k = k; else delete el.dataset.k;
+    }
+    else k = 0;
+    if (k < total(el)) el.classList.remove('is-done');
+    syncSlide(slide);
+    return true;
+  }
+  function reset(slide) {
+    steps(slide).forEach(function (el) {
+      Array.from(el.classList).forEach(function (c) { if (/^s\d+$/.test(c)) el.classList.remove(c); });
+      if (el.classList.contains('is-done')) el.classList.remove('is-done'); delete el.dataset.k;
+    });
+    if (slide.classList.contains('is-stepdone')) slide.classList.remove('is-stepdone');
+    slide.querySelectorAll('.is-ans').forEach(function (el) { el.classList.remove('is-ans'); });
+    slide.querySelectorAll('.is-open').forEach(function (el) { el.classList.remove('is-open'); });
+  }
+  window.stepNav = { forward: forward, back: back, reset: reset };
+
+  document.addEventListener('keydown', function (e) {
+    if (editing() || e.altKey || e.ctrlKey || e.metaKey) return;
+    var s = active(); if (!s) return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      if (forward(s)) { e.preventDefault(); e.stopImmediatePropagation(); }
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      if (back(s)) { e.preventDefault(); e.stopImmediatePropagation(); }
+    }
+  }, true);
+  document.addEventListener('click', function (e) {
+    if (editing()) return;
+    if (e.target.closest('a, button, input, textarea, #plan-panel, .plan-note, #edit-bar, #overview, .stepclick, .optbtn, .rvz__cover')) return;
+    var s = active(); if (!s) return;
+    var ok = e.clientX < window.innerWidth / 3 ? back(s) : forward(s);
+    if (ok) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+  // 離開一頁就重設（等淡出跑完），回來時是乾淨的初始狀態。只在「active → 非 active」那一刻觸發。
+  document.querySelectorAll('.deck > .slide').forEach(function (s) {
+    new MutationObserver(function (muts) {
+      var left = muts.some(function (m) { return /(^|\s)active(\s|$)/.test(m.oldValue || '') && !s.classList.contains('active'); });
+      if (left) setTimeout(function () { if (!s.classList.contains('active')) reset(s); }, 450);
+    }).observe(s, { attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+  });
+})();
