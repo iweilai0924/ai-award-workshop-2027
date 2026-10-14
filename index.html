@@ -1642,6 +1642,10 @@ html.edit-on .r2-hn__st p{font-size:calc(1.4*var(--u));line-height:1.4;}
 .r2-p20bg .s2-16chips{flex-wrap:nowrap;gap:calc(.9*var(--u));}
 .r2-p20bg .s2-16chips span{font-size:calc(2.1*var(--u));padding:calc(.6*var(--u)) calc(1.2*var(--u));white-space:nowrap;}
 .r2-p20bg .page-label__num{background:rgba(255,255,255,.88);border-radius:calc(.4*var(--u));padding:0 calc(.6*var(--u));}
+/* ===== R2-P26CR（10/14 老師刪掉圖說後，書封右下角保留極小的出處） ===== */
+.r2-p27cover{position:relative;display:inline-block;margin-bottom:calc(.8*var(--u));}
+.r2-p27cover img{margin-bottom:0!important;}
+.r2-p27cover__cr{position:absolute;right:calc(.5*var(--u));bottom:calc(.4*var(--u));font-size:calc(1*var(--u));color:rgba(255,255,255,.55);letter-spacing:.04em;}
 </style>
 </head>
 <body>
@@ -1652,7 +1656,7 @@ html.edit-on .r2-hn__st p{font-size:calc(1.4*var(--u));line-height:1.4;}
   <div class="page-label"><span class="page-label__num">01</span><span class="page-label__bar"></span><span>封面</span></div>
   <img class="r2-cover__kv anim-fade" src="assets/kv-2027.jpg" alt="2027 AI數感盃主視覺：人機共創 數寫新章，NumNum 與 πmi 從神經網路圖後方探出頭">
   <div class="r2-cover__info anim-up" style="--anim-delay:.4s">
-    <small>TEACHER WORKSHOP&nbsp;·&nbsp;120 MIN</small>
+    
     <b>2027 AI數感盃 教師研習</b>
     <span>賴以威｜臺師大電機系・數感實驗室共同創辦人</span>
   </div>
@@ -1697,7 +1701,7 @@ html.edit-on .r2-hn__st p{font-size:calc(1.4*var(--u));line-height:1.4;}
         <div class="s1-opt"><span class="s1-opt__k">C</span><span class="s1-opt__t">詩人</span></div>
       </div>
     </div>
-    <div class="s1-hint anim-fade" style="--anim-delay:1.8s">沒有獎品，但一定要選一個</div>
+    
   </div>
 </section>
 <section class="slide probe-breather" style="background:#17293A;">
@@ -2402,15 +2406,15 @@ html.edit-on .r2-hn__st p{font-size:calc(1.4*var(--u));line-height:1.4;}
     </div>
     <div class="s2-21grid">
       <div class="r2-p27book">
-        <img src="assets/book-tenchi-meisatsu-jp-kadokawa.png" alt="冲方丁《天地明察》日文原版（角川書店，2009）書封">
+        <div class="r2-p27cover"><img src="assets/book-tenchi-meisatsu-jp-kadokawa.png" alt="冲方丁《天地明察》日文原版（角川書店，2009）書封"><span class="r2-p27cover__cr">© KADOKAWA</span></div>
         <div class="r2-p27book__t">冲方丁《天地明察》</div>
-        <div class="r2-p27book__d">2010 本屋大賞｜日文原版 角川書店<br>書封取自 KADOKAWA 官網</div>
+        <div class="r2-p27book__d">2010 本屋大賞</div>
         <a class="r2-p27link" href="https://www.youtube.com/watch?v=Kb8yz-DNOmA" target="_blank" rel="noopener">▶ 電影預告片（2012）</a>
       </div>
       <div class="s2-21beats anim-stagger">
         <div class="s2-21beat"><i>1</i><div>主角在澀谷<b>金王八幡宮</b>看算額。</div></div>
-        <div class="s2-21beat"><i>2</i><div>他算錯了。<br>等他回來，答案已經被人<span class="r2d-nw">寫上——<b>關孝和</b>。</span></div></div>
-        <div class="s2-21beat"><i>3</i><div><b>題目在一間廟，答案在另一間廟</b>，<br>隔了八年。</div></div>
+        <div class="s2-21beat"><i>2</i><div>他算錯了。等他回來，答案已經<span class="r2d-nw">被人寫上<b>關孝和</b>。</span></div></div>
+        <div class="s2-21beat"><i>3</i><div><b style="color:#006689;">天地明察</b><br>只有天與地才能回答的問題。</div></div>
       </div>
       <div class="r2-p27fig">
         <img src="assets/shibukawa-shunkai.jpg" alt="澀川春海畫像">
